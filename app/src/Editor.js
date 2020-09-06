@@ -5,9 +5,12 @@ import {
   insertEmphasizingTag,
   insertLink,
   changeTagType,
+  turnIntoTag,
 } from "./utils/EditorUtils";
 
 const Editor = ({}) => {
+  const [markdownText, setMarkdownText] = useState("");
+
   const checkAndChangeText = (e) => {
     const currentElement = window.getSelection().focusNode;
     if (e.keyCode === 48) {
@@ -33,10 +36,35 @@ const Editor = ({}) => {
     }
   };
 
+  const htmlToMarkdown = (htmlStr) => {
+    const turndownService = new TurndownService();
+    return turndownService.turndown(htmlStr);
+  };
+
+  const saveToFiles = (e) => {
+    const editor = e.target.nextSibling;
+    const filename = "gonggeul.md";
+    const newAtag = document.createElement("a");
+    newAtag.setAttribute(
+      "href",
+      `data:text/markdown;charset=utf-8,${encodeURIComponent(
+        htmlToMarkdown(editor)
+      )}`
+    );
+    newAtag.setAttribute("download", filename);
+    newAtag.style.display = "none";
+    document.body.appendChild(newAtag);
+    newAtag.click();
+    newAtag.remove();
+  };
+
   return (
     <EditorContainer>
       <Title>GongGeul</Title>
       <SubTitle>Simple Markdown Editor</SubTitle>
+      <Button type="button" onClick={(e) => saveToFiles(e)}>
+        SAVE
+      </Button>
       <EditorDiv
         contentEditable={true}
         onKeyUp={(e) => checkAndChangeText(e)}
@@ -77,6 +105,17 @@ const Title = styled.h1`
 
 const SubTitle = styled.h3`
   color: grey;
+`;
+
+const Button = styled.button`
+  border: none;
+  border-radius: 0.25em;
+  padding: 1em;
+  letter-spacing: 0.25em;
+  text-align: center;
+  float: right;
+  background-color: #71c3b3;
+  color: #ffffff;
 `;
 
 const EditorDiv = styled.div`
