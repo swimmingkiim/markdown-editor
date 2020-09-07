@@ -1,12 +1,14 @@
 import React from "react";
 import styled, { createGlobalStyle } from "styled-components";
 import Editor from "./Editor";
+import Footer from "./Footer";
 
 const App = () => {
   return (
     <>
       <GlobalStyle />
       <Editor />
+      <Footer />
     </>
   );
 };
@@ -20,7 +22,7 @@ const GlobalStyle = createGlobalStyle`
   }
   html, body, #root {
     width: 100%;
-    height: 100%;
+    min-height: 100%;
   }
 `;
 

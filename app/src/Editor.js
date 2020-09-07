@@ -90,7 +90,7 @@ const Editor = ({}) => {
 
 const EditorContainer = styled.main`
   width: 70%;
-  height: 100%;
+  min-height: 100vh;
   margin: auto;
   padding: 5%;
   display: flex;
@@ -101,10 +101,12 @@ const EditorContainer = styled.main`
 
 const Title = styled.h1`
   color: #000000;
+  padding: 0.5%;
 `;
 
 const SubTitle = styled.h3`
   color: grey;
+  padding: 2%;
 `;
 
 const Button = styled.button`
@@ -121,6 +123,7 @@ const Button = styled.button`
 const EditorDiv = styled.div`
   width: 100%;
   height: 80%;
+  flex: 1;
   padding: 5%;
   font-size: 150%;
   background-color: white;
