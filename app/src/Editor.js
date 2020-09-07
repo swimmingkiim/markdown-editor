@@ -42,7 +42,10 @@ const Editor = ({}) => {
   };
 
   const saveToFiles = (e) => {
-    const editor = e.target.nextSibling;
+    const editor =
+      window.innerWidth <= 768
+        ? e.target.parentNode.previousSibling
+        : e.target.nextSibling;
     const filename = "gonggeul.md";
     const newAtag = document.createElement("a");
     newAtag.setAttribute(
