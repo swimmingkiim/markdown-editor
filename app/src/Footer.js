@@ -29,6 +29,9 @@ const Explaination = styled.p`
   font-size: 120%;
   font-weight: 700;
   margin-bottom: 1%;
+  @media only screen and (max-width: 768px) {
+    font-size: 100%;
+  }
 `;
 
 const GithubLink = styled.a`
@@ -36,6 +39,9 @@ const GithubLink = styled.a`
   font-size: 120%;
   font-weight: 700;
   text-decoration: none;
+  @media only screen and (max-width: 768px) {
+    font-size: 100%;
+  }
 `;
 
 export default Footer;

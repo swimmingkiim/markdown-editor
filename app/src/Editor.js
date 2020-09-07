@@ -62,7 +62,7 @@ const Editor = ({}) => {
     <EditorContainer>
       <Title>GongGeul</Title>
       <SubTitle>Simple Markdown Editor</SubTitle>
-      <Button type="button" onClick={(e) => saveToFiles(e)}>
+      <Button className="desktop" type="button" onClick={(e) => saveToFiles(e)}>
         SAVE
       </Button>
       <EditorDiv
@@ -84,6 +84,15 @@ const Editor = ({}) => {
           <li>[displaytext](url): link</li>
         </ul>
       </EditorDiv>
+      <ButtonContainer>
+        <Button
+          className="mobile"
+          type="button"
+          onClick={(e) => saveToFiles(e)}
+        >
+          SAVE
+        </Button>
+      </ButtonContainer>
     </EditorContainer>
   );
 };
@@ -97,16 +106,37 @@ const EditorContainer = styled.main`
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  @media only screen and (max-width: 768px) {
+    padding: 1%;
+    position: relative;
+    padding-top: 7.5%;
+  }
 `;
 
 const Title = styled.h1`
   color: #000000;
   padding: 0.5%;
+  @media only screen and (max-width: 768px) {
+    padding: 0.25em;
+  }
 `;
 
 const SubTitle = styled.h3`
   color: grey;
   padding: 2%;
+  @media only screen and (max-width: 768px) {
+    padding: 1em;
+    margin-bottom: 1em;
+    font-size: 100%;
+  }
+`;
+
+const ButtonContainer = styled.div`
+  width: 100%;
+  @media only screen and (max-width: 768px) {
+    position: sticky;
+    bottom: 2.5%;
+  }
 `;
 
 const Button = styled.button`
@@ -118,6 +148,21 @@ const Button = styled.button`
   float: right;
   background-color: #71c3b3;
   color: #ffffff;
+  &.mobile {
+    display: none;
+  }
+  &.desktop {
+    display: inline-block;
+  }
+  @media only screen and (max-width: 768px) {
+    &.mobile {
+      display: inline-block;
+      transform: translateX(50%);
+    }
+    &.desktop {
+      display: none;
+    }
+  }
 `;
 
 const EditorDiv = styled.div`
@@ -148,6 +193,10 @@ const EditorDiv = styled.div`
   & > * {
     width: 100%;
     line-height: 1.5em;
+  }
+
+  @media only screen and (max-width: 768px) {
+    font-size: 100%;
   }
 `;
 
