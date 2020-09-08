@@ -1,7 +1,7 @@
 import React, { useRef } from "react";
 import PropTypes, { element } from "prop-types";
 import styled from "styled-components";
-import { checkAndChangeText } from "./utils/editorUtils";
+import { checkAndChangeText, turnIntoHeading } from "./utils/editorUtils";
 import { openTextFile } from "./utils/markdownToHTML";
 import { saveToFiles } from "./utils/htmlToMarkdown";
 
@@ -31,7 +31,8 @@ const Editor = ({}) => {
       <EditorDiv
         ref={editor}
         contentEditable={true}
-        onKeyUp={(e) => checkAndChangeText(e)}
+        // onKeyUp={(e) => checkAndChangeText(e)}
+        onInput={(e) => checkAndChangeText(e)}
         suppressContentEditableWarning={true}
       >
         <h3>Things that you can use</h3>

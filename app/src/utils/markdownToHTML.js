@@ -61,7 +61,7 @@ export const readFileToText = (file, editor) => {
     deleteAllPrevText(editor);
     textToHTML(reader.result, editor);
   };
-  reader.readAsText(file, "euc-kr");
+  reader.readAsText(file);
 };
 
 export const openTextFile = (e, editor) => {

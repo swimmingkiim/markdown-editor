@@ -22,6 +22,18 @@ export const turnIntoTag = (content) => {
       const headingThree = document.createElement("h3");
       headingThree.innerHTML = "Title";
       return headingThree;
+    case "####":
+      const headingFour = document.createElement("h4");
+      headingThree.innerHTML = "Title";
+      return headingFour;
+    case "#####":
+      const headingFive = document.createElement("h5");
+      headingThree.innerHTML = "Title";
+      return headingFive;
+    case "######":
+      const headingSix = document.createElement("h6");
+      headingThree.innerHTML = "Title";
+      return headingSix;
     case "__":
       const strong = document.createElement("strong");
       return strong;
@@ -156,6 +168,9 @@ export const checkAndChangeText = (e) => {
     window.getSelection().anchorOffset - 1,
     window.getSelection().anchorOffset
   );
+  if (typedChar === " ") {
+    changeTagType(currentElement, e.target);
+  }
   if (typedChar === ")") {
     const imageAddressString = currentElement.textContent.match(
       /\!(\[.+\])(\(.+\))/g
@@ -175,8 +190,6 @@ export const checkAndChangeText = (e) => {
     } else {
       insertEmphasizingTag(currentElement, "_");
     }
-  } else if (typedChar === " ") {
-    changeTagType(currentElement, e.target);
   } else if (typedChar === "~" || typedChar === "`") {
     if (currentElement.textContent.indexOf("~~") >= 0) {
       insertEmphasizingTag(currentElement, "~~");
