@@ -1,74 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef } from "react";
 import PropTypes, { element } from "prop-types";
 import styled from "styled-components";
-import {
-  insertEmphasizingTag,
-  insertLink,
-  changeTagType,
-  turnIntoTag,
-} from "./utils/EditorUtils";
+import { checkAndChangeText } from "./utils/editorUtils";
+import { openTextFile } from "./utils/markdownToHTML";
+import { saveToFiles } from "./utils/htmlToMarkdown";
 
 const Editor = ({}) => {
-  const [markdownText, setMarkdownText] = useState("");
-
-  const checkAndChangeText = (e) => {
-    const currentElement = window.getSelection().focusNode;
-    if (e.keyCode === 48) {
-      const addressString = currentElement.textContent.match(
-        /(\[.+\])(\(.+\))/g
-      );
-      if (addressString) insertLink(currentElement, addressString[0]);
-    }
-    if (e.keyCode === 189) {
-      if (currentElement.textContent.indexOf("__") >= 0) {
-        insertEmphasizingTag(currentElement, "__");
-      } else {
-        insertEmphasizingTag(currentElement, "_");
-      }
-    } else if (e.keyCode === 32) {
-      changeTagType(currentElement, e.target);
-    } else if (e.keyCode === 192) {
-      if (currentElement.textContent.indexOf("~~") >= 0) {
-        insertEmphasizingTag(currentElement, "~~");
-      } else {
-        insertEmphasizingTag(currentElement, "`");
-      }
-    }
-  };
-
-  const htmlToMarkdown = (htmlStr) => {
-    const turndownService = new TurndownService();
-    return turndownService.turndown(htmlStr);
-  };
-
-  const saveToFiles = (e) => {
-    const editor =
-      window.innerWidth <= 768
-        ? e.target.parentNode.previousSibling
-        : e.target.nextSibling;
-    const filename = "gonggeul.md";
-    const newAtag = document.createElement("a");
-    newAtag.setAttribute(
-      "href",
-      `data:text/markdown;charset=utf-8,${encodeURIComponent(
-        htmlToMarkdown(editor)
-      )}`
-    );
-    newAtag.setAttribute("download", filename);
-    newAtag.style.display = "none";
-    document.body.appendChild(newAtag);
-    newAtag.click();
-    newAtag.remove();
-  };
+  const editor = useRef();
 
   return (
     <EditorContainer>
       <Title>GongGeul</Title>
       <SubTitle>Simple Markdown Editor</SubTitle>
-      <Button className="desktop" type="button" onClick={(e) => saveToFiles(e)}>
-        SAVE
-      </Button>
+      <ButtonContainer>
+        <Button
+          className="desktop"
+          type="button"
+          onClick={(e) => saveToFiles(e, editor.current)}
+        >
+          SAVE
+        </Button>
+        <Button
+          className="desktop"
+          type="button"
+          onClick={(e) => openTextFile(e, editor.current)}
+        >
+          OPEN
+        </Button>
+      </ButtonContainer>
       <EditorDiv
+        ref={editor}
         contentEditable={true}
         onKeyUp={(e) => checkAndChangeText(e)}
         suppressContentEditableWarning={true}
@@ -85,15 +46,23 @@ const Editor = ({}) => {
           <li>~~deletedtext~~: deleted</li>
           <li>`highlight`: highlight</li>
           <li>[displaytext](url): link</li>
+          <li>![title](url): image</li>
         </ul>
       </EditorDiv>
       <ButtonContainer>
         <Button
           className="mobile"
           type="button"
-          onClick={(e) => saveToFiles(e)}
+          onClick={(e) => saveToFiles(e, editor.current)}
         >
           SAVE
+        </Button>
+        <Button
+          className="mobile"
+          type="button"
+          onClick={(e) => openTextFile(e, editor.current)}
+        >
+          OPEN
         </Button>
       </ButtonContainer>
     </EditorContainer>
@@ -136,9 +105,24 @@ const SubTitle = styled.h3`
 
 const ButtonContainer = styled.div`
   width: 100%;
+  padding: 0 30%;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  button + button {
+    margin-left: 5%;
+  }
   @media only screen and (max-width: 768px) {
     position: sticky;
     bottom: 2.5%;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 0 0 0 60%;
+
+    button + button {
+      margin: 5% 0 0 0;
+    }
   }
 `;
 
@@ -198,8 +182,16 @@ const EditorDiv = styled.div`
     line-height: 1.5em;
   }
 
+  img {
+    width: 100%;
+  }
+
   @media only screen and (max-width: 768px) {
     font-size: 100%;
+    ol,
+    ul {
+      margin-left: 10%;
+    }
   }
 `;
 

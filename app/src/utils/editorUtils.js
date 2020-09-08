@@ -37,6 +37,9 @@ export const turnIntoTag = (content) => {
     case "[]()":
       const a = document.createElement("a");
       return a;
+    case "![]()":
+      const img = document.createElement("img");
+      return img;
     default:
       return null;
   }
@@ -101,6 +104,32 @@ export const insertLink = (currentElement, rawString) => {
   setCursorToNextChar(newElement);
 };
 
+export const insertImage = (currentElement, rawString) => {
+  const displayText = rawString.slice(
+    rawString.indexOf("[") + 1,
+    rawString.indexOf("]")
+  );
+  const url = rawString.slice(
+    rawString.indexOf("(") + 1,
+    rawString.indexOf(")")
+  );
+  const newElement = turnIntoTag("![]()");
+  newElement.setAttribute("src", url);
+  newElement.setAttribute("alt", displayText);
+  const oldText = document.createRange();
+  oldText.setStart(
+    currentElement,
+    currentElement.textContent.indexOf(rawString)
+  );
+  oldText.setEnd(
+    currentElement,
+    currentElement.textContent.indexOf(rawString) + rawString.length
+  );
+  oldText.deleteContents();
+  oldText.insertNode(newElement);
+  setCursorToNextChar(newElement);
+};
+
 export const changeTagType = (currentElement, rootContainer) => {
   const firstWord = currentElement.textContent.slice(
     0,
@@ -118,5 +147,41 @@ export const changeTagType = (currentElement, rootContainer) => {
       currentElement.parentNode
     );
     currentElement.parentNode.remove();
+  }
+};
+
+export const checkAndChangeText = (e) => {
+  const currentElement = window.getSelection().focusNode;
+  const typedChar = currentElement.textContent.slice(
+    window.getSelection().anchorOffset - 1,
+    window.getSelection().anchorOffset
+  );
+  if (typedChar === ")") {
+    const imageAddressString = currentElement.textContent.match(
+      /\!(\[.+\])(\(.+\))/g
+    );
+    if (imageAddressString) insertImage(currentElement, imageAddressString[0]);
+    else {
+      const linkAddressString = currentElement.textContent.match(
+        /(\[.+\])(\(.+\))/g
+      );
+      if (linkAddressString) insertLink(currentElement, linkAddressString[0]);
+    }
+  }
+
+  if (typedChar === "_") {
+    if (currentElement.textContent.indexOf("__") >= 0) {
+      insertEmphasizingTag(currentElement, "__");
+    } else {
+      insertEmphasizingTag(currentElement, "_");
+    }
+  } else if (typedChar === " ") {
+    changeTagType(currentElement, e.target);
+  } else if (typedChar === "~" || typedChar === "`") {
+    if (currentElement.textContent.indexOf("~~") >= 0) {
+      insertEmphasizingTag(currentElement, "~~");
+    } else {
+      insertEmphasizingTag(currentElement, "`");
+    }
   }
 };
