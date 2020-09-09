@@ -20,9 +20,20 @@ const htmlToMarkdown = (editor) => {
   children.forEach((tag, i) => {
     if (
       i > 0 &&
-      ["UL", "OL", "DIV", "H1", "H2", "H3", "H4", "H5", "H6", "IMG"].includes(
-        tag.tagName
-      )
+      [
+        "UL",
+        "OL",
+        "DIV",
+        "H1",
+        "H2",
+        "H3",
+        "H4",
+        "H5",
+        "H6",
+        "IMG",
+        "BLOCKQUOTE",
+        "HR",
+      ].includes(tag.tagName)
     )
       resultText += "\n";
     if (tag.nodeType === 3) {
@@ -107,6 +118,8 @@ const turnIntoMarkdown = (tag, tagName, option = {}) => {
       return `![${option.alt}](${option.src})`;
     case "HR":
       return "---";
+    case "BLOCKQUOTE":
+      return `> ${content}`;
     case "DIV":
       return `${content}`;
     default:

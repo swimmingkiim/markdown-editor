@@ -51,6 +51,9 @@ export const turnIntoTag = (content) => {
     case "hr":
       const hr = document.createElement("hr");
       return hr;
+    case "blockquote":
+      const blockquote = document.createElement("blockquote");
+      return blockquote;
     default:
       return document.createElement("div");
   }
@@ -87,6 +90,9 @@ const textToHTML = (text, editor) => {
     console.log(lines[i]);
     if (lines[i].startsWith("#")) {
       editor.appendChild(turnIntoHeading(lines[i]));
+    } else if (lines[i].startsWith(">")) {
+      const blockquote = turnIntoTag("blockquote");
+      editor.appendChild(checkLineText(blockquote, lines[i].slice(1)));
     } else if (getTypeOfList(lines[i]) !== null) {
       const newList = turnIntoTag(getTypeOfList(lines[i]));
       editor.appendChild(newList);

@@ -1,4 +1,5 @@
-# GongGeul(공글)---
+# GongGeul(공글)
+---
 * It's a simple markdown editor project inspired by Typora.
 * I wanted to make a simple, both visually and functionally, productivity application.
 

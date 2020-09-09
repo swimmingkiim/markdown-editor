@@ -55,6 +55,14 @@ export const turnIntoTag = (content) => {
     case "---":
       const hr = document.createElement("hr");
       return hr;
+    case ">":
+      const blockquote = document.createElement("blockquote");
+      blockquote.innerText = " ";
+      return blockquote;
+    case "div":
+      const div = document.createElement("div");
+      div.innerText = " ";
+      return div;
     default:
       return null;
   }
@@ -76,12 +84,12 @@ export const turnOldtextIntoNewElement = (
   );
   oldText.deleteContents();
   oldText.insertNode(newElement);
-  setCursorToNextChar(newElement);
+  setCursorToNextChar(newElement, " ");
 };
 
-export const setCursorToNextChar = (newElement) => {
+export const setCursorToNextChar = (newElement, afterNode) => {
   const nextCursor = document.createRange();
-  newElement.after(" ");
+  newElement.after(afterNode);
   nextCursor.setStart(newElement.nextSibling, 1);
   nextCursor.collapse(false);
   window.getSelection().removeAllRanges();
@@ -158,6 +166,21 @@ export const turnPrefixIntoTag = (currentElement, rootContainer) => {
     );
     currentElement.parentNode.remove();
   }
+  if (firstWord === "---") setCursorToNextChar(newElement, turnIntoTag("div"));
+};
+
+const terminateBlockquote = (currentElement) => {
+  if (
+    currentElement.tagName === "BLOCKQUOTE" &&
+    currentElement.previousSibling &&
+    currentElement.previousSibling.innerHTML === "<br>"
+  ) {
+    const newLine = turnIntoTag("div");
+    currentElement.parentElement.appendChild(newLine);
+    currentElement.previousSibling.remove();
+    currentElement.remove();
+    setCursorToNextChar(newLine, " ");
+  }
 };
 
 export const useInputIntoHTML = (e) => {
@@ -167,6 +190,9 @@ export const useInputIntoHTML = (e) => {
     window.getSelection().anchorOffset
   );
   switch (typedChar) {
+    case "":
+      terminateBlockquote(currentElement);
+      return;
     case " ":
       return turnPrefixIntoTag(currentElement, e.target);
     case ")":

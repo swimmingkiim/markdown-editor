@@ -47,6 +47,8 @@ const Editor = ({}) => {
           <li>`highlight`: highlight</li>
           <li>[displaytext](url): link</li>
           <li>![title](url): image</li>
+          <li>--- : line</li>
+          <li>&gt; : blockquote</li>
         </ul>
       </EditorDiv>
       <ButtonContainer>
@@ -163,8 +165,27 @@ const EditorDiv = styled.div`
   overflow-wrap: anywhere;
 
   ol,
-  ul {
+  ul,
+  blockquote {
     margin-left: 5%;
+  }
+
+  blockquote {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  blockquote + div {
+    margin-top: 2.5%;
+  }
+
+  & > blockquote::before {
+    content: "";
+    width: 1rem;
+    height: 100%;
+    background-color: #41ba6e;
+    position: absolute;
+    left: 0;
   }
 
   & mark {
