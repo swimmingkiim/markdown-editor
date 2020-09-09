@@ -60,6 +60,25 @@ export const turnIntoTag = (content) => {
   }
 };
 
+export const turnOldtextIntoNewElement = (
+  currentElement,
+  newElement,
+  rawString
+) => {
+  const oldText = document.createRange();
+  oldText.setStart(
+    currentElement,
+    currentElement.textContent.indexOf(rawString)
+  );
+  oldText.setEnd(
+    currentElement,
+    currentElement.textContent.indexOf(rawString) + rawString.length
+  );
+  oldText.deleteContents();
+  oldText.insertNode(newElement);
+  setCursorToNextChar(newElement);
+};
+
 export const setCursorToNextChar = (newElement) => {
   const nextCursor = document.createRange();
   newElement.after(" ");
@@ -69,7 +88,7 @@ export const setCursorToNextChar = (newElement) => {
   window.getSelection().addRange(nextCursor);
 };
 
-export const insertEmphasizingTag = (currentElement, trimChar) => {
+export const turnTargetIntoSubtag = (currentElement, trimChar) => {
   if (currentElement.textContent.indexOf(trimChar) >= 0) {
     const frontUnderscoreIndex = currentElement.textContent.indexOf(trimChar);
     const backUnderscoreIndex = currentElement.textContent.lastIndexOf(
@@ -78,20 +97,17 @@ export const insertEmphasizingTag = (currentElement, trimChar) => {
     if (frontUnderscoreIndex !== backUnderscoreIndex) {
       if (frontUnderscoreIndex + 1 === backUnderscoreIndex) return;
       const newElement = turnIntoTag(trimChar);
-      const oldText = document.createRange();
-      oldText.setStart(currentElement, frontUnderscoreIndex);
-      oldText.setEnd(currentElement, backUnderscoreIndex + trimChar.length);
-      oldText.surroundContents(newElement);
-      newElement.textContent = newElement.textContent.replace(
-        new RegExp(`[(${trimChar})]`, "g"),
-        ""
+      const rawString = currentElement.textContent.slice(
+        frontUnderscoreIndex,
+        backUnderscoreIndex + trimChar.length
       );
-      setCursorToNextChar(newElement);
+      newElement.innerHTML = rawString.replace(new RegExp(trimChar, "g"), "");
+      turnOldtextIntoNewElement(currentElement, newElement, rawString);
     }
   }
 };
 
-export const insertLink = (currentElement, rawString) => {
+export const getDisplayTextAndURL = (rawString) => {
   const displayText = rawString.slice(
     rawString.indexOf("[") + 1,
     rawString.indexOf("]")
@@ -100,52 +116,31 @@ export const insertLink = (currentElement, rawString) => {
     rawString.indexOf("(") + 1,
     rawString.indexOf(")")
   );
+  return {
+    displayText,
+    url,
+  };
+};
+
+export const insertLink = (currentElement, rawString) => {
+  const { displayText, url } = getDisplayTextAndURL(rawString);
   const newElement = turnIntoTag("[]()");
   newElement.setAttribute("href", url);
   newElement.setAttribute("contenteditable", "false");
   newElement.setAttribute("target", "_blank");
   newElement.innerHTML = displayText;
-  const oldText = document.createRange();
-  oldText.setStart(
-    currentElement,
-    currentElement.textContent.indexOf(rawString)
-  );
-  oldText.setEnd(
-    currentElement,
-    currentElement.textContent.indexOf(rawString) + rawString.length
-  );
-  oldText.deleteContents();
-  oldText.insertNode(newElement);
-  setCursorToNextChar(newElement);
+  turnOldtextIntoNewElement(currentElement, newElement, rawString);
 };
 
 export const insertImage = (currentElement, rawString) => {
-  const displayText = rawString.slice(
-    rawString.indexOf("[") + 1,
-    rawString.indexOf("]")
-  );
-  const url = rawString.slice(
-    rawString.indexOf("(") + 1,
-    rawString.indexOf(")")
-  );
+  const { displayText, url } = getDisplayTextAndURL(rawString);
   const newElement = turnIntoTag("![]()");
   newElement.setAttribute("src", url);
   newElement.setAttribute("alt", displayText);
-  const oldText = document.createRange();
-  oldText.setStart(
-    currentElement,
-    currentElement.textContent.indexOf(rawString)
-  );
-  oldText.setEnd(
-    currentElement,
-    currentElement.textContent.indexOf(rawString) + rawString.length
-  );
-  oldText.deleteContents();
-  oldText.insertNode(newElement);
-  setCursorToNextChar(newElement);
+  turnOldtextIntoNewElement(currentElement, newElement, rawString);
 };
 
-export const changeTagType = (currentElement, rootContainer) => {
+export const turnPrefixIntoTag = (currentElement, rootContainer) => {
   const firstWord = currentElement.textContent.slice(
     0,
     currentElement.textContent.indexOf(" ")
@@ -165,43 +160,47 @@ export const changeTagType = (currentElement, rootContainer) => {
   }
 };
 
-export const checkAndChangeText = (e) => {
+export const useInputIntoHTML = (e) => {
   const currentElement = window.getSelection().focusNode;
   const typedChar = currentElement.textContent.slice(
     window.getSelection().anchorOffset - 1,
     window.getSelection().anchorOffset
   );
-  if (typedChar === " ") {
-    changeTagType(currentElement, e.target);
-  }
-  if (typedChar === ")") {
-    const imageAddressString = currentElement.textContent.match(
-      /\!(\[.+\])(\(.+\))/g
-    );
-    if (imageAddressString) insertImage(currentElement, imageAddressString[0]);
-    else {
-      const linkAddressString = currentElement.textContent.match(
-        /(\[.+\])(\(.+\))/g
+  switch (typedChar) {
+    case " ":
+      return turnPrefixIntoTag(currentElement, e.target);
+    case ")":
+      const imageAddressString = currentElement.textContent.match(
+        /\!(\[.+\])(\(.+\))/g
       );
-      if (linkAddressString) insertLink(currentElement, linkAddressString[0]);
-    }
-  }
-
-  if (typedChar === "_") {
-    if (currentElement.textContent.indexOf("__") >= 0) {
-      insertEmphasizingTag(currentElement, "__");
-    } else {
-      insertEmphasizingTag(currentElement, "_");
-    }
-  } else if (typedChar === "-") {
-    if (currentElement.textContent.indexOf("---") >= 0) {
-      insertEmphasizingTag(currentElement, "---");
-    }
-  } else if (typedChar === "~" || typedChar === "`") {
-    if (currentElement.textContent.indexOf("~~") >= 0) {
-      insertEmphasizingTag(currentElement, "~~");
-    } else {
-      insertEmphasizingTag(currentElement, "`");
-    }
+      if (imageAddressString)
+        return insertImage(currentElement, imageAddressString[0]);
+      else {
+        const linkAddressString = currentElement.textContent.match(
+          /(\[.+\])(\(.+\))/g
+        );
+        if (linkAddressString)
+          return insertLink(currentElement, linkAddressString[0]);
+      }
+      return;
+    case "_":
+      if (currentElement.textContent.indexOf("__") >= 0) {
+        return turnTargetIntoSubtag(currentElement, "__");
+      }
+      return turnTargetIntoSubtag(currentElement, "_");
+    case "-":
+      if (currentElement.textContent.indexOf("---") >= 0) {
+        return turnTargetIntoSubtag(currentElement, "---");
+      }
+      return;
+    case "~":
+      if (currentElement.textContent.indexOf("~~") >= 0) {
+        return turnTargetIntoSubtag(currentElement, "~~");
+      }
+      return;
+    case "`":
+      return turnTargetIntoSubtag(currentElement, "`");
+    default:
+      return;
   }
 };
