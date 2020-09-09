@@ -52,6 +52,9 @@ export const turnIntoTag = (content) => {
     case "![]()":
       const img = document.createElement("img");
       return img;
+    case "---":
+      const hr = document.createElement("hr");
+      return hr;
     default:
       return null;
   }
@@ -189,6 +192,10 @@ export const checkAndChangeText = (e) => {
       insertEmphasizingTag(currentElement, "__");
     } else {
       insertEmphasizingTag(currentElement, "_");
+    }
+  } else if (typedChar === "-") {
+    if (currentElement.textContent.indexOf("---") >= 0) {
+      insertEmphasizingTag(currentElement, "---");
     }
   } else if (typedChar === "~" || typedChar === "`") {
     if (currentElement.textContent.indexOf("~~") >= 0) {

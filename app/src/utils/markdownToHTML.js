@@ -45,6 +45,12 @@ export const turnIntoTag = (content) => {
     case "img":
       const img = document.createElement("img");
       return img;
+    case "br":
+      const br = document.createElement("br");
+      return br;
+    case "hr":
+      const hr = document.createElement("hr");
+      return hr;
     default:
       return document.createElement("div");
   }
@@ -78,12 +84,19 @@ export const openTextFile = (e, editor) => {
 const textToHTML = (text, editor) => {
   const lines = text.split("\n");
   for (let i = 0; i < lines.length; i++) {
+    console.log(lines[i]);
     if (lines[i].startsWith("#")) {
       editor.appendChild(turnIntoHeading(lines[i]));
     } else if (getTypeOfList(lines[i]) !== null) {
       const newList = turnIntoTag(getTypeOfList(lines[i]));
       editor.appendChild(newList);
       i = turnIntoList(newList, lines, i);
+    } else if (lines[i] === "") {
+      const br = turnIntoTag("br");
+      editor.appendChild(br);
+    } else if (lines[i] === "---") {
+      const hr = turnIntoTag("hr");
+      editor.appendChild(hr);
     } else {
       const div = turnIntoTag("div");
       editor.appendChild(checkLineText(div, lines[i]));

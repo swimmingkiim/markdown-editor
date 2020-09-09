@@ -37,7 +37,7 @@ const htmlToMarkdown = (editor) => {
         alt: tag.alt ? tag.alt : null,
       };
       resultText += turnIntoMarkdown(tag, tag.tagName, option);
-    } else if (tag.tagName.startsWith("H")) {
+    } else if (tag.tagName.match(/^H[1-6]/) !== null) {
       resultText += turnIntoMarkdown(tag, tag.tagName);
     } else {
       resultText += turnIntoMarkdown(tag, tag.tagName);
@@ -105,6 +105,10 @@ const turnIntoMarkdown = (tag, tagName, option = {}) => {
       return `[${option.text}](${option.href})`;
     case "IMG":
       return `![${option.alt}](${option.src})`;
+    case "HR":
+      return "---";
+    case "DIV":
+      return `${content}`;
     default:
       return `${content}`;
   }
