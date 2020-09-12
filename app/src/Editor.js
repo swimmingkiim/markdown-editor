@@ -194,6 +194,10 @@ const EditorDiv = styled.div`
     padding: 0.1em;
   }
 
+  & > hr {
+    margin: 1% 0;
+  }
+
   &:focus {
     outline: none;
   }

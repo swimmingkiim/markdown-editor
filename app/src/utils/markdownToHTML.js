@@ -226,8 +226,12 @@ const turnIntoList = (parentElement, lines, index) => {
     parentElement.appendChild(newList);
     return turnIntoList(newList, lines, ++index);
   } else if (prevDepth > depth) {
-    parentElement.parentNode.appendChild(newLi);
-    return turnIntoList(parentElement.parentNode, lines, ++index);
+    const indentGap = (prevDepth - depth) / 2;
+    let targetNode = Array(indentGap)
+      .fill(0)
+      .reduce((acc, curr) => acc.parentNode, parentElement);
+    targetNode.appendChild(newLi);
+    return turnIntoList(targetNode, lines, ++index);
   } else {
     parentElement.appendChild(newLi);
     return turnIntoList(parentElement, lines, ++index);
